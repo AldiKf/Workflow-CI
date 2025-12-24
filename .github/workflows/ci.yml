@@ -31,13 +31,34 @@ jobs:
       with:
         name: mlruns
         path: mlruns
+        
     - name: Get latest MLflow run_id
       run: |
         RUN_ID=$(ls mlruns/0 | head -n 1)
         echo "RUN_ID=$RUN_ID" >> $GITHUB_ENV
 
+    - name: Get latest MLflow run_id safely
+      run: |
+        python <<EOF
+        import mlflow
+        from mlflow.tracking import MlflowClient
+    
+        client = MlflowClient()
+        experiments = client.search_experiments()
+    
+        exp = [e for e in experiments if e.name == "Student Exam Score - CI"][0]
+        runs = client.search_runs(exp.experiment_id, order_by=["attributes.start_time DESC"])
+    
+        run_id = runs[0].info.run_id
+        print("Latest run_id:", run_id)
+    
+        with open("run_id.txt", "w") as f:
+            f.write(run_id)
+        EOF
+    
     - name: Build Docker Image with MLflow
       run: |
+        RUN_ID=$(cat run_id.txt)
         mlflow models build-docker \
           --model-uri runs:/$RUN_ID/model \
           --name student-score-model
