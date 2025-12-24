@@ -27,10 +27,11 @@ with mlflow.start_run():
 
     y_pred = model.predict(X_test)
 
-    mse = mean_squared_error(y_test, y_pred)
-    r2 = r2_score(y_test, y_pred)
+    mlflow.sklearn.log_model(
+        sk_model=model,
+        artifact_path="model",
+        registered_model_name="StudentScoreModel"
+    )
 
-    print("MSE:", mse)
-    print("R2:", r2)
 
 
