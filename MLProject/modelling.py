@@ -8,7 +8,7 @@ from sklearn.metrics import mean_squared_error, r2_score
 import mlflow
 import mlflow.sklearn
 
-df = pd.read_csv("MLProject/student_score_preprocessing.csv")
+df = pd.read_csv("student_score_preprocessing.csv")
 
 X = df.drop(columns=["exam_score"])
 y = df["exam_score"]
@@ -32,4 +32,5 @@ with mlflow.start_run():
 
     print("MSE:", mse)
     print("R2:", r2)
+
 
